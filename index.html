@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>
+window.onerror=function(msg,src,line,col,err){window.parent.postMessage({type:'app-error',message:msg,source:src,lineno:line,colno:col,stack:err&&err.stack||''},'*');};
+window.onunhandledrejection=function(e){window.parent.postMessage({type:'app-error',message:'Unhandled promise rejection: '+(e.reason&&e.reason.message||e.reason||'unknown'),stack:e.reason&&e.reason.stack||''},'*');};
+window.addEventListener('error',function(e){var t=e&&e.target;if(t&&t!==window&&t.tagName==='SCRIPT'){var u=t.src||'';window.parent.postMessage({type:'app-error',message:'Failed to load script'+(u?': '+u:' (inline module)'),source:u},'*');}},true);
+(function(){var _f=window.fetch;window.fetch=function(){var a=arguments,u=typeof a[0]==='string'?a[0]:(a[0]&&a[0].url)||'';var p=_f.apply(this,a);p.then(function(r){if(r.status===500){r.clone().text().then(function(b){window.parent.postMessage({type:'fetch-error',url:u,status:500,body:b},'*');}).catch(function(){window.parent.postMessage({type:'fetch-error',url:u,status:500,body:''},'*');});}}).catch(function(e){window.parent.postMessage({type:'fetch-error',url:u,status:0,body:e.message||'fetch failed'},'*');});return p;};})();
+</script>
+<script src="https://builder.puter.com/runtime.js" defer></script>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ContentFlow AI</title>
+<meta name="description" content="Generate YouTube titles, descriptions, thumbnails, hooks, outlines and tags with AI." />
+<meta name="theme-color" content="#4f46e5" />
+<link rel="icon" href="icon.svg" type="image/svg+xml" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://js.puter.com/v2/"></script>
+<script>
+tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] }, colors: { brand: { 50:'#eef2ff',100:'#e0e7ff',500:'#6366f1',600:'#4f46e5',700:'#4338ca' } } } } };
+</script>
+<style>
+  body { -webkit-font-smoothing: antialiased; }
+  .spin { animation: spin 0.8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .skeleton { background: #f1f5f9; border-radius: 6px; animation: pulse 1.4s ease-in-out infinite; }
+  @keyframes pulse { 50% { opacity: .5; } }
+  .fade-in { animation: fade .3s ease-out; }
+  @keyframes fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+  .hidden-important { display: none !important; }
+  textarea:focus, input:focus, select:focus { outline: none; }
+</style>
+    <!-- puter-pwa: generated, do not edit -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon-180.png">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="ContentFlow">
+    <!-- /puter-pwa -->
+</head>
+<body class="bg-slate-50 text-slate-900 font-sans min-h-screen">
+
+  <!-- Top bar -->
+  <header class="sticky top-0 z-30 bg-white/90 backdrop-blur border-b border-slate-200">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <img src="icon.svg" alt="" class="w-8 h-8" />
+        <span class="font-semibold text-[15px] tracking-tight">ContentFlow AI</span>
+      </div>
+      <div id="userArea" class="flex items-center gap-2"></div>
+    </div>
+  </header>
+
+  <!-- Loading -->
+  <div id="bootView" class="flex items-center justify-center py-40">
+    <i data-lucide="loader-2" class="w-6 h-6 text-slate-400 spin"></i>
+  </div>
+
+  <!-- Signed out -->
+  <main id="signedOutView" class="hidden">
+    <div class="max-w-xl mx-auto px-6 py-20 sm:py-28 text-center">
+      <div class="inline-flex items-center gap-1.5 text-xs font-medium text-brand-700 bg-brand-50 border border-brand-100 rounded-full px-3 py-1 mb-6">
+        <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> AI content toolkit for YouTube creators
+      </div>
+      <h1 class="text-3xl sm:text-4xl font-bold tracking-tight">Turn one topic into a complete video plan</h1>
+      <p class="mt-4 text-slate-600 leading-relaxed">Titles, description, thumbnail ideas, a scroll-stopping hook, an outline and tags — generated in seconds.</p>
+      <button id="signInBtn" class="mt-8 inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white font-medium px-5 py-3 rounded-xl transition">
+        <i data-lucide="log-in" class="w-4 h-4"></i> Sign in with Puter
+      </button>
+      <div class="mt-14 grid grid-cols-2 sm:grid-cols-3 gap-3 text-left">
+        <div class="bg-white border border-slate-200 rounded-xl p-4"><i data-lucide="type" class="w-4 h-4 text-brand-600"></i><p class="mt-2 text-sm font-medium">5 title ideas</p></div>
+        <div class="bg-white border border-slate-200 rounded-xl p-4"><i data-lucide="file-text" class="w-4 h-4 text-brand-600"></i><p class="mt-2 text-sm font-medium">Description</p></div>
+        <div class="bg-white border border-slate-200 rounded-xl p-4"><i data-lucide="image" class="w-4 h-4 text-brand-600"></i><p class="mt-2 text-sm font-medium">Thumbnail ideas</p></div>
+        <div class="bg-white border border-slate-200 rounded-xl p-4"><i data-lucide="zap" class="w-4 h-4 text-brand-600"></i><p class="mt-2 text-sm font-medium">Intro hook</p></div>
+        <div class="bg-white border border-slate-200 rounded-xl p-4"><i data-lucide="list-ordered" class="w-4 h-4 text-brand-600"></i><p class="mt-2 text-sm font-medium">Video outline</p></div>
+        <div class="bg-white border border-slate-200 rounded-xl p-4"><i data-lucide="hash" class="w-4 h-4 text-brand-600"></i><p class="mt-2 text-sm font-medium">Keywords & tags</p></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Dashboard -->
+  <main id="dashboardView" class="hidden">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-8 grid lg:grid-cols-[1fr_260px] gap-6">
+      <div class="min-w-0">
+        <!-- Input card -->
+        <section class="bg-white border border-slate-200 rounded-2xl p-5 sm:p-6">
+          <h2 class="text-lg font-semibold tracking-tight">New video</h2>
+          <p class="text-sm text-slate-500 mt-0.5">Describe your video topic and we'll build the content package.</p>
+          <form id="genForm" class="mt-5 space-y-4">
+            <div>
+              <label for="topic" class="text-sm font-medium text-slate-700">Video topic</label>
+              <textarea id="topic" rows="2" maxlength="300" placeholder="e.g. How to start a vegetable garden on a small balcony" class="mt-1.5 w-full resize-none rounded-xl border border-slate-300 px-3.5 py-2.5 text-[15px] focus:border-brand-500 focus:ring-4 focus:ring-brand-100 transition"></textarea>
+            </div>
+            <div class="grid sm:grid-cols-2 gap-4">
+              <div>
+                <label for="tone" class="text-sm font-medium text-slate-700">Tone</label>
+                <select id="tone" class="mt-1.5 w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-100">
+                  <option>Engaging</option><option>Educational</option><option>Casual</option><option>Professional</option><option>Funny</option><option>Inspirational</option>
+                </select>
+              </div>
+              <div>
+                <label for="audience" class="text-sm font-medium text-slate-700">Target audience <span class="text-slate-400 font-normal">(optional)</span></label>
+                <input id="audience" type="text" maxlength="100" placeholder="e.g. Beginners, students" class="mt-1.5 w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm focus:border-brand-500 focus:ring-4 focus:ring-brand-100" />
+              </div>
+            </div>
+            <div class="flex flex-wrap items-center gap-3 pt-1">
+              <button id="generateBtn" type="submit" class="inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-medium px-5 py-2.5 rounded-xl transition">
+                <i data-lucide="sparkles" class="w-4 h-4"></i><span>Generate Content</span>
+              </button>
+              <span id="formError" class="text-sm text-red-600"></span>
+            </div>
+          </form>
+        </section>
+
+        <!-- Results -->
+        <section id="results" class="mt-6"></section>
+      </div>
+
+      <!-- History -->
+      <aside class="lg:sticky lg:top-24 h-fit">
+        <div class="bg-white border border-slate-200 rounded-2xl p-4">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-sm font-semibold flex items-center gap-2"><i data-lucide="history" class="w-4 h-4 text-slate-500"></i> Recent</h3>
+            <button id="clearHistory" class="text-xs text-slate-400 hover:text-red-600 hidden">Clear</button>
+          </div>
+          <ul id="historyList" class="space-y-1"></ul>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-sm px-4 py-2 rounded-lg opacity-0 pointer-events-none transition-opacity z-50"></div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

@@ -2,7 +2,8 @@
 
 # 🚀 CreatorFlow AI
 
-https://postimg.cc/sv1HKmRj
+
+[![puter.png](https://i.postimg.cc/BQCWS7YK/puter.png)](https://postimg.cc/sv1HKmRj)
 
 **An AI-powered YouTube content creation assistant that transforms video topics into ready-to-use content ideas.**
 
